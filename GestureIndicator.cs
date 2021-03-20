@@ -28,16 +28,18 @@ namespace GestureIndicator
             MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable");
         }
 
-        public override void VRChat_OnUiManagerInit() => OnPreferencesSaved();
+        public override void VRChat_OnUiManagerInit()
+        {
+            CreateIndicators();
+
+            OnPreferencesSaved();
+        }
 
         public override void OnPreferencesSaved()
         {
             m_Enable = MelonPreferences.GetEntryValue<bool>(GetType().Name, "Enable");
 
-            if (m_Enable)
-                CreateIndicators();
-            else
-                DestroyIndicators();
+            ToggleIndicators(m_Enable);
         }
 
         private IEnumerator CheckGesture()
@@ -139,14 +141,15 @@ namespace GestureIndicator
             m_RightGestureText.alignment = TextAnchor.MiddleRight;
             m_RightGestureText.color = color;
             m_RightGestureText.fontStyle = FontStyle.Normal;
-
-            MelonCoroutines.Start(CheckGesture());
         }
 
-        private void DestroyIndicators()
+        private void ToggleIndicators(bool enable)
         {
-            UnityEngine.Object.DestroyImmediate(m_LeftGestureText);
-            UnityEngine.Object.DestroyImmediate(m_RightGestureText);
+            if (enable)
+                MelonCoroutines.Start(CheckGesture());
+
+            m_LeftGestureText.gameObject.SetActive(enable);
+            m_RightGestureText.gameObject.SetActive(enable);
         }
     }
 }
