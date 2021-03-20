@@ -119,7 +119,7 @@ namespace GestureIndicator
 
         private void CreateIndicators()
         {
-            Transform hud = Manager.GetVRCUiManager().transform.Find("UnscaledUI/HudContent/Hud");
+            Transform hud = Manager.GetVRCUiManager().transform.Find("UnscaledUI/HudContent");
 
             Color color = Color.cyan;
             color.a = 0.85f;
