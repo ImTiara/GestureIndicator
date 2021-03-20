@@ -11,7 +11,7 @@ namespace GestureIndicator
         public const string Name = "GestureIndicator";
         public const string Author = "ImTiara";
         public const string Company = null;
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
         public const string DownloadLink = "https://github.com/ImTiara/GestureIndicator/releases";
     }
 
