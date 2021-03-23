@@ -1,10 +1,22 @@
-﻿namespace GestureIndicator
+﻿using UnityEngine;
+
+namespace GestureIndicator
 {
     public class Manager
     {
         private static HandGestureController _getHandGestureController { get; set; }
         private static VRCUiManager _getVRCUiManager { get; set; }
         private static QuickMenu _getQuickMenu { get; set; }
+
+        public static Color HexToColor(string hex)
+        {
+            hex = !hex.StartsWith("#") ? "#" + hex : hex;
+
+            Color c;
+            ColorUtility.TryParseHtmlString(hex, out c);
+
+            return c;
+        }
 
         public static Gesture GetGesture(Hand hand)
         {

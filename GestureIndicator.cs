@@ -18,7 +18,8 @@ namespace GestureIndicator
     public class GestureIndicator : MelonMod
     {
         private bool m_Enable;
-        private Color m_TextColor = Color.cyan;
+        private Color m_LeftTextColor = Color.cyan;
+        private Color m_RightTextColor = Color.cyan;
         private float m_TextOpacity;
 
         private Text m_LeftGestureText;
@@ -29,6 +30,8 @@ namespace GestureIndicator
             MelonPreferences.CreateCategory(GetType().Name, "Gesture Indicator");
             MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable Gesture Indicator");
             MelonPreferences.CreateEntry(GetType().Name, "TextOpacity", 85f, "Text Opacity (%)");
+            MelonPreferences.CreateEntry(GetType().Name, "LeftTextColor", "#00FFFF", "Left Text Color");
+            MelonPreferences.CreateEntry(GetType().Name, "RightTextColor", "#00FFFF", "Right Text Color");
         }
 
         public override void VRChat_OnUiManagerInit()
@@ -42,9 +45,11 @@ namespace GestureIndicator
         {
             m_Enable = MelonPreferences.GetEntryValue<bool>(GetType().Name, "Enable");
             m_TextOpacity = MelonPreferences.GetEntryValue<float>(GetType().Name, "TextOpacity");
+            m_LeftTextColor = Manager.HexToColor(MelonPreferences.GetEntryValue<string>(GetType().Name, "LeftTextColor"));
+            m_RightTextColor = Manager.HexToColor(MelonPreferences.GetEntryValue<string>(GetType().Name, "RightTextColor"));
 
             ToggleIndicators(m_Enable);
-            SetTextOpacity(m_TextOpacity);
+            ApplyTextColors();
         }
 
         private IEnumerator CheckGesture()
@@ -126,16 +131,12 @@ namespace GestureIndicator
         {
             Transform hud = Manager.GetVRCUiManager().transform.Find("UnscaledUI/HudContent");
 
-            Color color = m_TextColor;
-            color.a = m_TextOpacity / 100.0f;
-
             m_LeftGestureText = UnityEngine.Object.Instantiate(Manager.GetQuickMenu().transform.Find("QuickMenu_NewElements/_InfoBar/EarlyAccessText").gameObject, hud, true).GetComponent<Text>();
             RectTransform rectTransformLeft = m_LeftGestureText.GetComponent<RectTransform>();
             rectTransformLeft.anchoredPosition = new Vector3(290, -924, 0);
             rectTransformLeft.localScale = new Vector2(0.4f, 0.4f);
             m_LeftGestureText.text = "";
             m_LeftGestureText.alignment = TextAnchor.MiddleLeft;
-            m_LeftGestureText.color = color;
             m_LeftGestureText.fontStyle = FontStyle.Normal;
 
             m_RightGestureText = UnityEngine.Object.Instantiate(Manager.GetQuickMenu().transform.Find("QuickMenu_NewElements/_InfoBar/EarlyAccessText").gameObject, hud, true).GetComponent<Text>();
@@ -144,19 +145,24 @@ namespace GestureIndicator
             rectTransformRight.localScale = new Vector2(0.4f, 0.4f);
             m_RightGestureText.text = "";
             m_RightGestureText.alignment = TextAnchor.MiddleRight;
-            m_RightGestureText.color = color;
             m_RightGestureText.fontStyle = FontStyle.Normal;
+
+            ApplyTextColors();
         }
 
-        private void SetTextOpacity(float op)
+        private void ApplyTextColors()
         {
             if (m_LeftGestureText != null && m_RightGestureText != null)
             {
-                Color c = m_LeftGestureText.color;
-                c.a = op / 100.0f;
+                float op = m_TextOpacity / 100.0f;
 
-                m_LeftGestureText.color = c;
-                m_RightGestureText.color = c;
+                Color colorL = m_LeftTextColor;
+                colorL.a = op;
+                m_LeftGestureText.color = colorL;
+
+                Color colorR = m_RightTextColor;
+                colorR.a = op;
+                m_RightGestureText.color = colorR;
             }
         }
 
