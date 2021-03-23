@@ -25,7 +25,7 @@ namespace GestureIndicator
         public override void OnApplicationStart()
         {
             MelonPreferences.CreateCategory(GetType().Name, "Gesture Indicator");
-            MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable");
+            MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable Gesture Indicator");
         }
 
         public override void VRChat_OnUiManagerInit()
