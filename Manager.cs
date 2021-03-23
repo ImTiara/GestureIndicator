@@ -6,7 +6,7 @@
         private static VRCUiManager _getVRCUiManager { get; set; }
         private static QuickMenu _getQuickMenu { get; set; }
 
-        static public Gesture GetGesture(Hand hand)
+        public static Gesture GetGesture(Hand hand)
         {
             Gesture gesture = Gesture.Normal;
 
