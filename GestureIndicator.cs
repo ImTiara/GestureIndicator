@@ -18,6 +18,8 @@ namespace GestureIndicator
     public class GestureIndicator : MelonMod
     {
         private bool m_Enable;
+        private Color m_TextColor = Color.cyan;
+        private float m_TextOpacity;
 
         private Text m_LeftGestureText;
         private Text m_RightGestureText;
@@ -26,6 +28,7 @@ namespace GestureIndicator
         {
             MelonPreferences.CreateCategory(GetType().Name, "Gesture Indicator");
             MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable Gesture Indicator");
+            MelonPreferences.CreateEntry(GetType().Name, "TextOpacity", 85f, "Text Opacity (%)");
         }
 
         public override void VRChat_OnUiManagerInit()
@@ -38,8 +41,10 @@ namespace GestureIndicator
         public override void OnPreferencesSaved()
         {
             m_Enable = MelonPreferences.GetEntryValue<bool>(GetType().Name, "Enable");
+            m_TextOpacity = MelonPreferences.GetEntryValue<float>(GetType().Name, "TextOpacity");
 
             ToggleIndicators(m_Enable);
+            SetTextOpacity(m_TextOpacity);
         }
 
         private IEnumerator CheckGesture()
@@ -121,8 +126,8 @@ namespace GestureIndicator
         {
             Transform hud = Manager.GetVRCUiManager().transform.Find("UnscaledUI/HudContent");
 
-            Color color = Color.cyan;
-            color.a = 0.85f;
+            Color color = m_TextColor;
+            color.a = m_TextOpacity / 100.0f;
 
             m_LeftGestureText = UnityEngine.Object.Instantiate(Manager.GetQuickMenu().transform.Find("QuickMenu_NewElements/_InfoBar/EarlyAccessText").gameObject, hud, true).GetComponent<Text>();
             RectTransform rectTransformLeft = m_LeftGestureText.GetComponent<RectTransform>();
@@ -143,10 +148,21 @@ namespace GestureIndicator
             m_RightGestureText.fontStyle = FontStyle.Normal;
         }
 
+        private void SetTextOpacity(float op)
+        {
+            if (m_LeftGestureText != null && m_RightGestureText != null)
+            {
+                Color c = m_LeftGestureText.color;
+                c.a = op / 100.0f;
+
+                m_LeftGestureText.color = c;
+                m_RightGestureText.color = c;
+            }
+        }
+
         private void ToggleIndicators(bool enable)
         {
-            if (enable)
-                MelonCoroutines.Start(CheckGesture());
+            if (enable) MelonCoroutines.Start(CheckGesture());
 
             m_LeftGestureText.gameObject.SetActive(enable);
             m_RightGestureText.gameObject.SetActive(enable);
