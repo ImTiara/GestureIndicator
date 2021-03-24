@@ -21,9 +21,14 @@ namespace GestureIndicator
         private Color m_LeftTextColor = Color.cyan;
         private Color m_RightTextColor = Color.cyan;
         private float m_TextOpacity;
+        private int m_DisplayTime;
 
         private Text m_LeftGestureText;
         private Text m_RightGestureText;
+        private Manager.Gesture m_LeftPrevious;
+        private Manager.Gesture m_RightPrevious;
+        private DateTime m_LeftTime;
+        private DateTime m_RightTime;
 
         public override void OnApplicationStart()
         {
@@ -32,6 +37,7 @@ namespace GestureIndicator
             MelonPreferences.CreateEntry(GetType().Name, "TextOpacity", 85f, "Text Opacity (%)");
             MelonPreferences.CreateEntry(GetType().Name, "LeftTextColor", "#00FFFF", "Left Text Color");
             MelonPreferences.CreateEntry(GetType().Name, "RightTextColor", "#00FFFF", "Right Text Color");
+            MelonPreferences.CreateEntry(GetType().Name, "DisplayTime", 2000, "Milliseconds to display");
         }
 
         public override void VRChat_OnUiManagerInit()
@@ -47,6 +53,7 @@ namespace GestureIndicator
             m_TextOpacity = MelonPreferences.GetEntryValue<float>(GetType().Name, "TextOpacity");
             m_LeftTextColor = Manager.HexToColor(MelonPreferences.GetEntryValue<string>(GetType().Name, "LeftTextColor"));
             m_RightTextColor = Manager.HexToColor(MelonPreferences.GetEntryValue<string>(GetType().Name, "RightTextColor"));
+            m_DisplayTime = MelonPreferences.GetEntryValue<int>(GetType().Name, "DisplayTime");
 
             ToggleIndicators(m_Enable);
             ApplyTextColors();
@@ -60,41 +67,50 @@ namespace GestureIndicator
                 {
                     if (Manager.GetLocalVRCPlayer() != null && m_LeftGestureText != null && m_RightGestureText != null)
                     {
-                        if (Manager.GetGestureLeftWeight() >= 0.1f)
+                        Manager.Gesture leftGesture = Manager.GetGesture(Manager.Hand.Left);
+                        if (leftGesture != m_LeftPrevious)
                         {
-                            Manager.Gesture leftGesture = Manager.GetGesture(Manager.Hand.Left);
-                            switch (leftGesture)
-                            {
-                                case Manager.Gesture.Fist:
-                                    m_LeftGestureText.text = "Fist";
-                                    break;
-                                case Manager.Gesture.Open:
-                                    m_LeftGestureText.text = "Hand Open";
-                                    break;
-                                case Manager.Gesture.Point:
-                                    m_LeftGestureText.text = "Point";
-                                    break;
-                                case Manager.Gesture.Victory:
-                                    m_LeftGestureText.text = "Victory";
-                                    break;
-                                case Manager.Gesture.RockNRoll:
-                                    m_LeftGestureText.text = "RockNRoll";
-                                    break;
-                                case Manager.Gesture.Gun:
-                                    m_LeftGestureText.text = "Hand Gun";
-                                    break;
-                                case Manager.Gesture.ThumbsUp:
-                                    m_LeftGestureText.text = "Thumbs Up";
-                                    break;
+                            m_LeftPrevious = leftGesture;
+                            m_LeftTime = DateTime.Now.AddMilliseconds(m_DisplayTime);
+                            if (Manager.GetGestureLeftWeight() >= 0.1f) {
+                                switch (leftGesture)
+                                {
+                                    case Manager.Gesture.Fist:
+                                        m_LeftGestureText.text = "Fist";
+                                        break;
+                                    case Manager.Gesture.Open:
+                                        m_LeftGestureText.text = "Hand Open";
+                                        break;
+                                    case Manager.Gesture.Point:
+                                        m_LeftGestureText.text = "Point";
+                                        break;
+                                    case Manager.Gesture.Victory:
+                                        m_LeftGestureText.text = "Victory";
+                                        break;
+                                    case Manager.Gesture.RockNRoll:
+                                        m_LeftGestureText.text = "RockNRoll";
+                                        break;
+                                    case Manager.Gesture.Gun:
+                                        m_LeftGestureText.text = "Hand Gun";
+                                        break;
+                                    case Manager.Gesture.ThumbsUp:
+                                        m_LeftGestureText.text = "Thumbs Up";
+                                        break;
+                                }
                             }
+                            else m_LeftGestureText.text = "";
                         }
-                        else m_LeftGestureText.text = "";
+                        else if (m_LeftTime < DateTime.Now) m_LeftGestureText.text = "";
 
-                        if (Manager.GetGestureRightWeight() >= 0.1f)
+                        Manager.Gesture rightGesture = Manager.GetGesture(Manager.Hand.Right);
+                        if (rightGesture != m_RightPrevious)
                         {
-                            Manager.Gesture rightGesture = Manager.GetGesture(Manager.Hand.Right);
-                            switch (rightGesture)
+                            m_RightPrevious = rightGesture;
+                            m_RightTime = DateTime.Now.AddMilliseconds(m_DisplayTime);
+                            if (Manager.GetGestureRightWeight() >= 0.1f)
                             {
+                                switch (rightGesture)
+                                {
                                 case Manager.Gesture.Fist:
                                     m_RightGestureText.text = "Fist";
                                     break;
@@ -117,8 +133,10 @@ namespace GestureIndicator
                                     m_RightGestureText.text = "Thumbs Up";
                                     break;
                             }
+                            }
+                            else m_RightGestureText.text = "";
                         }
-                        else m_RightGestureText.text = "";
+                        else if (m_RightTime < DateTime.Now) m_RightGestureText.text = "";
                     }
                 }
                 catch (Exception e) { MelonLogger.Error("Error checking gesture: " + e); }
