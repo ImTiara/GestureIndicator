@@ -11,7 +11,7 @@ namespace GestureIndicator
         public const string Name = "GestureIndicator";
         public const string Author = "ImTiara";
         public const string Company = null;
-        public const string Version = "1.0.2";
+        public const string Version = "1.0.3";
         public const string DownloadLink = "https://github.com/ImTiara/GestureIndicator/releases";
     }
 
@@ -26,16 +26,16 @@ namespace GestureIndicator
         private Text m_RightGestureText;
 
         public override void OnApplicationStart()
+            => MelonCoroutines.Start(UiManagerInitializer());
+
+        public void OnUiManagerInit()
         {
             MelonPreferences.CreateCategory(GetType().Name, "Gesture Indicator");
             MelonPreferences.CreateEntry(GetType().Name, "Enable", true, "Enable Gesture Indicator");
             MelonPreferences.CreateEntry(GetType().Name, "TextOpacity", 85f, "Text Opacity (%)");
             MelonPreferences.CreateEntry(GetType().Name, "LeftTextColor", "#00FFFF", "Left Text Color");
             MelonPreferences.CreateEntry(GetType().Name, "RightTextColor", "#00FFFF", "Right Text Color");
-        }
 
-        public override void VRChat_OnUiManagerInit()
-        {
             CreateIndicators();
 
             OnPreferencesSaved();
@@ -172,6 +172,12 @@ namespace GestureIndicator
 
             m_LeftGestureText.gameObject.SetActive(enable);
             m_RightGestureText.gameObject.SetActive(enable);
+        }
+
+        public IEnumerator UiManagerInitializer()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null) yield return null;
+            OnUiManagerInit();
         }
     }
 }

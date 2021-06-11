@@ -12,8 +12,7 @@ namespace GestureIndicator
         {
             hex = !hex.StartsWith("#") ? "#" + hex : hex;
 
-            Color c;
-            ColorUtility.TryParseHtmlString(hex, out c);
+            ColorUtility.TryParseHtmlString(hex, out Color c);
 
             return c;
         }
