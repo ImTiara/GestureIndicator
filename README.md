@@ -1,3 +1,7 @@
+# Note
+This repository has been deprecated and is replaced with my new mods repository:
+https://github.com/ImTiara/VRCMods
+
 If you plan on using my code in your own project, please make sure to properly credit me! :)
 
 # GestureIndicator
